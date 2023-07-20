@@ -36,7 +36,6 @@ router.use((req, res, next) => {
         // Set user id
         res.locals.user_id = results[0].user_id;
         next();
-        console.log(res.locals.user_id);
     });
 });
 
@@ -44,7 +43,6 @@ router.get('/', (req, res) => {
     // Get all homework
     connection.query('SELECT * FROM '+config.mysql.tables.homework+' WHERE user_id = ?', [res.locals.user_id], (err, results) => {
         if (err) return res.status(500).send('Internal Server Error: ' + err);
-        console.log("SELECT * FROM "+config.mysql.tables.homework+" WHERE user_id = '"+res.locals.user_id+"'");
         res.json(results);
     });
 });
