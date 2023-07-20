@@ -71,7 +71,7 @@ router.get('/token', (req, res) => {
                 token_type: 'Bearer',
                 expires_in: 3600,
                 refresh_token: refresh_token
-             });
+            });
         });
     });
 });
