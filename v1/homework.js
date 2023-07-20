@@ -51,7 +51,40 @@ router.get('/', (req, res) => {
 });
 
 router.post('/', (req, res) => {
+    // Check if body is empty
+    if (!req.body) return res.status(400).json({error: 'invalid_request', error_description: 'Missing request body'});
 
+    // Check class_id
+    if (!req.body.class_id) return res.status(400).json({error: 'invalid_request', error_description: 'Missing class_id'});
+    // Check deadline
+    if (!req.body.deadline) return res.status(400).json({error: 'invalid_request', error_description: 'Missing deadline'});
+    // Check text
+    if (!req.body.text) return res.status(400).json({error: 'invalid_request', error_description: 'Missing text'});
+    // Check type
+    if (!req.body.type) return res.status(400).json({error: 'invalid_request', error_description: 'Missing type'});
+
+    // Check if class exists and user is owner
+    connection.query('SELECT * FROM '+config.mysql.tables.classes+' WHERE id = ? AND user_id = ?', [req.body.class_id, res.locals.user_id], (err, results) => {
+        if (err) return res.status(500).send('Internal Server Error: ' + err);
+        if (results.length == 0) return res.status(400).json({error: 'invalid_request', error_description: 'Class does not exist or you are not the owner'});
+        
+        // Check if deadline is in format YYYY-MM-DD
+        if (!req.body.deadline.match(/^\d{4}-\d{2}-\d{2}$/)) return res.status(400).json({error: 'invalid_request', error_description: 'Invalid deadline format'});
+        // Check if deadline is a valid date
+        if (isNaN(Date.parse(req.body.deadline))) return res.status(400).json({error: 'invalid_request', error_description: 'Invalid deadline'});
+
+        // Check if text is too long | max 75
+        if (req.body.text.length > 75) return res.status(400).json({error: 'invalid_request', error_description: 'Text is too long'});
+
+        // Check if type is valid | b/v/w/o
+        if (!req.body.type.match(/^[b|v|w|o]$/)) return res.status(400).json({error: 'invalid_request', error_description: 'Invalid type'});
+
+        // Insert homework
+        connection.query('INSERT INTO '+config.mysql.tables.homework+' (class, deadline, text, type, user_id) VALUES (?, ?, ?, ?, ?)', [req.body.class_id, req.body.deadline, req.body.text, req.body.type, res.locals.user_id], (err, results) => {
+            if (err) return res.status(500).send('Internal Server Error: ' + err);
+            res.json({id: results.insertId});
+        });
+    });
 });
 
 router.delete('/', (req, res) => {
