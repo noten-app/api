@@ -87,8 +87,19 @@ router.post('/', (req, res) => {
     });
 });
 
-router.delete('/', (req, res) => {
-
+router.delete('/:id', (req, res) => {
+    // Check if id is a number
+    if (isNaN(req.params.id)) return res.status(400).json({error: 'invalid_request', error_description: 'Invalid id'});
+    // Check if homework exists and user is owner
+    connection.query('SELECT * FROM '+config.mysql.tables.homework+' WHERE entry_id = ? AND user_id = ?', [req.params.id, res.locals.user_id], (err, results) => {
+        if (err) return res.status(500).send('Internal Server Error: ' + err);
+        if (results.length == 0) return res.status(400).json({error: 'invalid_request', error_description: 'Homework does not exist or you are not the owner'});
+        // Delete homework
+        connection.query('DELETE FROM '+config.mysql.tables.homework+' WHERE entry_id = ?', [req.params.id], (err, results) => {
+            if (err) return res.status(500).send('Internal Server Error: ' + err);
+            res.json({success: true});
+        });
+    });
 });
 
 router.patch('/', (req, res) => {
