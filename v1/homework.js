@@ -80,7 +80,9 @@ router.post('/', (req, res) => {
         if (!req.body.type.match(/^[b|v|w|o]$/)) return res.status(400).json({error: 'invalid_request', error_description: 'Invalid type'});
 
         // Insert homework
-        connection.query('INSERT INTO '+config.mysql.tables.homework+' (class, deadline, text, type, user_id) VALUES (?, ?, ?, ?, ?)', [req.body.class_id, req.body.deadline, req.body.text, req.body.type, res.locals.user_id], (err, results) => {
+        given = new Date();
+        given = given.toISOString().slice(0, 19).replace('T', ' ');
+        connection.query('INSERT INTO '+config.mysql.tables.homework+' (class, deadline, given, text, type, user_id) VALUES (?, ?, ?, ?, ?, ?)', [req.body.class_id, req.body.deadline, given, req.body.text, req.body.type, res.locals.user_id], (err, results) => {
             if (err) return res.status(500).send('Internal Server Error: ' + err);
             res.json({id: results.insertId});
         });
