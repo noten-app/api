@@ -104,8 +104,104 @@ router.delete('/:id', (req, res) => {
     });
 });
 
-router.patch('/', (req, res) => {
+router.patch('/:id', (req, res) => {
+    // Check if id is a number
+    if (isNaN(req.params.id)) return res.status(400).json({error: 'invalid_request', error_description: 'Invalid id'});
+    // Check if body is empty
+    if (!req.body) return res.status(400).json({error: 'invalid_request', error_description: 'Missing request body'});
 
+    // Load old homework data (user_id, entry_id, class, deadline, text, type, status)
+    connection.query('SELECT * FROM '+config.mysql.tables.homework+' WHERE entry_id = ?', [req.params.id], (err, results) => {
+        hw_entry = results[0];
+        error = false;
+        
+        // Check if user is owner
+        if (hw_entry.user_id != res.locals.user_id) { 
+            error = true;
+            return res.status(400).json({error: 'invalid_request', error_description: 'You are not the owner of this homework'});
+        }
+
+        // Check if class_id change is requested
+        if (!error && req.body.class_id) {
+            error = false;
+            // Check if class exists and user is owner
+            connection.query('SELECT * FROM '+config.mysql.tables.classes+' WHERE id = ? AND user_id = ?', [req.body.class_id, res.locals.user_id], (err, results) => {
+                if (err) {
+                    error = true;
+                    return res.status(500).send('Internal Server Error: ' + err);
+                }
+                if (results.length == 0) {
+                    error = true;
+                    return res.status(400).json({error: 'invalid_request', error_description: 'Class does not exist or you are not the owner'});
+                }
+                // Update class_id
+                hw_entry.class = req.body.class_id;
+            });
+        }
+
+        // Check if deadline change is requested
+        if (!error && req.body.deadline) {
+            error = false;
+            // Check if deadline is in format YYYY-MM-DD
+            if (!req.body.deadline.match(/^\d{4}-\d{2}-\d{2}$/)){
+                error = true;
+                return res.status(400).json({error: 'invalid_request', error_description: 'Invalid deadline format'});
+            }
+            // Check if deadline is a valid date
+            if (isNaN(Date.parse(req.body.deadline))){
+                error = true;
+                return res.status(400).json({error: 'invalid_request', error_description: 'Invalid deadline'});
+            }
+            // Update deadline
+            hw_entry.deadline = req.body.deadline;
+        }
+
+        // Check if text change is requested
+        if (!error && req.body.text) {
+            error = false;
+            // Check if text is too long | max 75
+            if (req.body.text.length > 75){
+                error = true;
+                return res.status(400).json({error: 'invalid_request', error_description: 'Text is too long'});
+            }
+            // Update text
+            hw_entry.text = req.body.text;
+        }
+
+        // Check if type change is requested
+        if (!error && req.body.type) {
+            error = false;
+            // Check if type is valid | b/v/w/o
+            if (!req.body.type.match(/^[b|v|w|o]$/)){
+                error = true;
+                return res.status(400).json({error: 'invalid_request', error_description: 'Invalid type'});
+            }
+            // Update type
+            hw_entry.type = req.body.type;
+        }
+
+        // Check if status change is requested
+        if (!error && req.body.status) {
+            error = false;
+            // Check if status is valid | 0/1/2
+            if (!req.body.status.toString().match(/^[0|1|2]$/)){
+                error = true;
+                return res.status(400).json({error: 'invalid_request', error_description: 'Invalid status'});
+            }
+            // Update status
+            hw_entry.status = req.body.status;
+        }
+
+        // Update homework
+        if (!error) {
+
+            // Update homework
+            connection.query('UPDATE '+config.mysql.tables.homework+' SET class = ?, deadline = ?, text = ?, type = ?, status = ? WHERE entry_id = ?', [hw_entry.class, hw_entry.deadline, hw_entry.text, hw_entry.type, hw_entry.status, req.params.id], (err, results) => {
+                if (err) return res.status(500).send('Internal Server Error: ' + err);
+                res.json({success: true});
+            });
+        }
+    });
 });
 
 
