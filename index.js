@@ -23,7 +23,8 @@ app.use((req, res, next) => {
 // V1
 app.use('/v1', require('./v1/routes.js'))
 
-// Wildcard route
-app.get('*', (req, res) => res.status(404).send('Warning: Route ' + req.url + ' does not exist'));
+// Ping route for Uptime-Monitoring-Software
+app.use('/ping', (req, res) => res.json("PONG"));
+
 
 app.listen(3000, () => console.log('Example app listening on port 3000!'));
