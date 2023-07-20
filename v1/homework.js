@@ -4,7 +4,7 @@
 const express = require('express');
 const router = express.Router();
 const mysql = require('mysql');
-const bcrypt = require('bcrypt');
+const bodyParser = require('body-parser');
 
 // Load config file with absolute path
 const config = require(__dirname+'/../config.json');
@@ -17,6 +17,9 @@ const connection = mysql.createConnection({
     database: config.mysql.credentials.database
 });
 connection.connect();
+
+// Body parser
+router.use(bodyParser.json());
 
 router.use((req, res, next) => { 
     // Check auth
