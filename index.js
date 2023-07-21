@@ -21,7 +21,7 @@ app.use((req, res, next) => {
 });
 
 // V1
-app.use('/v1', require('./v1/routes.js'))
+app.use('/v1', require('./v1/routes.js'));
 
 // Ping route for Uptime-Monitoring-Software
 app.use('/ping', require('./ping.js'));
