@@ -24,7 +24,7 @@ app.use((req, res, next) => {
 app.use('/v1', require('./v1/routes.js'))
 
 // Ping route for Uptime-Monitoring-Software
-app.use('/ping', (req, res) => res.json("PONG"));
+app.use('/ping', require('./ping.js'));
 
 // Wildcard routes
 app.use('*', (req, res) => res.status(404).send('Warning: The requested route does not exist!'));
