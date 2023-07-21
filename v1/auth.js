@@ -97,6 +97,9 @@ router.get('/refresh', (req, res) => {
     connection.query('SELECT * FROM '+config.mysql.tables.tokens+' WHERE refresh_token = ?', [req.query.refresh_token], (err, results) => {
         if (err) return res.status(500).send('Internal Server Error: ' + err);
 
+        // Check if the refresh token exists
+        if (results.length == 0) return res.status(400).json({error: 'invalid_grant', error_description: 'Refresh token does not exist'});
+        
         // Generate a random token a-z A-Z 0-9 (32 characters long)
         let token = "";
         let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
