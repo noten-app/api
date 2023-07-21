@@ -6,8 +6,8 @@ const router = express.Router();
 // AUTH
 router.use('/auth', require('./auth.js'));
 
-// // CLASSES
-// router.use('/classes', require('./classes.js'));
+// CLASSES
+router.use('/classes', require('./classes.js'));
 
 // GRADES
 router.use('/grades', require('./grades.js'));
