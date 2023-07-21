@@ -9,8 +9,8 @@ router.use('/auth', require('./auth.js'));
 // // CLASSES
 // router.use('/classes', require('./classes.js'));
 
-// // GRADES
-// router.use('/grades', require('./grades.js'));
+// GRADES
+router.use('/grades', require('./grades.js'));
 
 // HOMEWORK
 router.use('/homework', require('./homework.js'));
