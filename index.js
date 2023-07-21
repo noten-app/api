@@ -29,4 +29,4 @@ app.use('/ping', require('./ping.js'));
 // Wildcard routes
 app.use('*', (req, res) => res.status(404).send('Warning: The requested route does not exist!'));
 
-app.listen(config.port, () => console.log('Example app listening on port '+config.port+'!'));
+app.listen(config.port, () => console.log('Noten-App API listening on port '+config.port+'!'));
