@@ -187,11 +187,23 @@ router.patch('/:id', (req, res) => {
             class_entry.grade_s = req.body.grade_s;
         }
 
+        // Check if average change is requested (average can be floats but also integers)
+        if (!error && req.body.average) {
+            error = false;
+            // Check if average is valid
+            if (isNaN(req.body.average)) {
+                error = true;
+                return res.status(400).json({error: 'invalid_request', error_description: 'Invalid average'});
+            }
+            // Update average
+            class_entry.average = req.body.average;
+        }
+
         // Update homework
         if (!error) {
 
             // Update homework
-            connection.query('UPDATE '+config.mysql.tables.classes + ' SET name = ?, color = ?, grade_k = ?, grade_m = ?, grade_t = ?, grade_s = ? WHERE id = ?', [class_entry.name, class_entry.color, class_entry.grade_k, class_entry.grade_m, class_entry.grade_t, class_entry.grade_s, req.params.id], (err, results) => {
+            connection.query('UPDATE '+config.mysql.tables.classes + ' SET name = ?, color = ?, grade_k = ?, grade_m = ?, grade_t = ?, grade_s = ?, average = ? WHERE id = ?', [class_entry.name, class_entry.color, class_entry.grade_k, class_entry.grade_m, class_entry.grade_t, class_entry.grade_s, class_entry.average ,req.params.id], (err, results) => {
                 if (err) return res.status(500).send('Internal Server Error: ' + err);
                 res.json({success: true});
             });
