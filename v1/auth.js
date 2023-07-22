@@ -39,7 +39,7 @@ router.get('/token', (req, res) => {
 
     // Check if the user exists
     connection.query('SELECT * FROM '+config.mysql.tables.accounts+' WHERE username = ?', [req.query.username], (err, results) => {
-        if (err) return res.status(500).send('Internal Server Error: ' + err);
+        if (err) return res.status(500).send('Internal Server Error');
         if (results.length == 0) return res.status(400).send('Bad Request: User does not exist');
         
         // Check if the password is correct (Password in the DB is hashed using php's password_hash() function)
@@ -47,7 +47,7 @@ router.get('/token', (req, res) => {
         
         // Delete the tokens if there are any tokens with the same user_id
         connection.query('DELETE FROM '+config.mysql.tables.tokens+' WHERE user_id = ?', [results[0].id], (err, results) => {
-            if (err) return res.status(500).send('Internal Server Error: ' + err);
+            if (err) return res.status(500).send('Internal Server Error');
         });
         
         // Generate a random token a-z A-Z 0-9 (32 characters long)
@@ -63,7 +63,7 @@ router.get('/token', (req, res) => {
         expiry.setHours(expiry.getHours() + 1);
         expiry = expiry.toISOString().slice(0, 19).replace('T', ' ');
         connection.query('INSERT INTO '+config.mysql.tables.tokens+' (user_id, access_token, token_type, expiry, refresh_token) VALUES (?, ?, ?, ?, ?)', [results[0].id, token, 'Bearer', expiry, refresh_token], (err, results) => {
-            if (err) return res.status(500).send('Internal Server Error: ' + err);
+            if (err) return res.status(500).send('Internal Server Error');
 
             // Send the token to the client
             res.send({ 
@@ -95,7 +95,7 @@ router.get('/refresh', (req, res) => {
 
     // Check if the refresh token exists
     connection.query('SELECT * FROM '+config.mysql.tables.tokens+' WHERE refresh_token = ?', [req.query.refresh_token], (err, results) => {
-        if (err) return res.status(500).send('Internal Server Error: ' + err);
+        if (err) return res.status(500).send('Internal Server Error');
 
         // Check if the refresh token exists
         if (results.length == 0) return res.status(400).json({error: 'invalid_grant', error_description: 'Refresh token does not exist'});
@@ -113,7 +113,7 @@ router.get('/refresh', (req, res) => {
         expiry.setHours(expiry.getHours() + 1);
         expiry = expiry.toISOString().slice(0, 19).replace('T', ' ');
         connection.query('UPDATE '+config.mysql.tables.tokens+' SET access_token = ?, expiry = ?, refresh_token = ? WHERE refresh_token = ?', [token, expiry, refresh_token, req.query.refresh_token], (err, results) => {
-            if (err) return res.status(500).send('Internal Server Error: ' + err);
+            if (err) return res.status(500).send('Internal Server Error');
 
             // Send the token to the client            
             res.send({ 
