@@ -5,6 +5,8 @@ const app = express();
 // Load config file with absolute path
 const config = require(__dirname + '/config.json');
 
+// Disable xpoweredby Header
+app.disable('x-powered-by');
 
 // Simple request time logger
 app.use((req, res, next) => {
