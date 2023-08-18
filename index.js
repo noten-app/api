@@ -20,7 +20,7 @@ app.use((req, res, next) => {
     console.log('==============');
     if (config.logging) console.log('This request \x1b[32m%s\x1b[0m be logged!', 'will');
     else console.log('This request \x1b[31m%s\x1b[0m be logged!', 'will not');
-    next();  
+    next();
 });
 
 // V1
@@ -32,4 +32,4 @@ app.use('/ping', require('./ping.js'));
 // Wildcard routes
 app.use('*', (req, res) => res.status(404).send('Warning: The requested route does not exist!'));
 
-app.listen(config.port, () => console.log('Noten-App API listening on port '+config.port+'!'));
+app.listen(config.port, () => console.log('Noten-App API listening on port ' + config.port + '!'));
