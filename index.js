@@ -3,7 +3,8 @@ const express = require('express');
 const app = express();
 
 // Load config file with absolute path
-const config = require(__dirname+'/config.json');
+const config = require(__dirname + '/config.json');
+
 
 // Simple request time logger
 app.use((req, res, next) => {
