@@ -56,9 +56,11 @@ router.post('/', (req, res) => {
 
     // Check name
     if (!req.body.name) return res.status(400).json({ error: 'invalid_request', error_description: 'Missing name' });
+    if (typeof req.body.name != "string") return res.status(400).json({ error: 'invalid_request', error_description: 'Type of name is invalid' });
     if (req.body.name.length > 20) return res.status(400).json({ error: 'invalid_request', error_description: 'Name is too long' });
     // Check color
     if (!req.body.color) return res.status(400).json({ error: 'invalid_request', error_description: 'Missing color' });
+    if (typeof req.body.color != "string") return res.status(400).json({ error: 'invalid_request', error_description: 'Type of color is invalid' });
     if (!req.body.color.match(/^[0-9A-F]{6}$/i)) return res.status(400).json({ error: 'invalid_request', error_description: 'Invalid color' });
     // Check grade_k
     if (!req.body.grade_k) return res.status(400).json({ error: 'invalid_request', error_description: 'Missing grade_k' });
