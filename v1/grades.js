@@ -64,7 +64,7 @@ router.post('/', (req, res) => {
     if (!req.body.type) return res.status(400).json({ error: 'invalid_request', error_description: 'Missing type' });
 
     // Check if class exists and user is owner
-    connection.query('SELECT * FROM ' + config.mysql.tables.classes + ' WHERE id = ? AND user_id = ?', [req.body.class_id, res.locals.user_id], (err, results) => {
+    connection.query('SELECT * FROM ' + config.mysql.tables.subjects + ' WHERE id = ? AND user_id = ?', [req.body.class_id, res.locals.user_id], (err, results) => {
         if (err) return res.status(500).send('Internal Server Error');
         if (results.length == 0) return res.status(400).json({ error: 'invalid_request', error_description: 'Class does not exist or you are not the owner' });
 
@@ -125,7 +125,7 @@ router.patch('/:id', (req, res) => {
         if (!error && req.body.class_id) {
             error = false;
             // Check if class exists and user is owner
-            connection.query('SELECT * FROM ' + config.mysql.tables.classes + ' WHERE id = ? AND user_id = ?', [req.body.class_id, res.locals.user_id], (err, results) => {
+            connection.query('SELECT * FROM ' + config.mysql.tables.subjects + ' WHERE id = ? AND user_id = ?', [req.body.class_id, res.locals.user_id], (err, results) => {
                 if (err) {
                     error = true;
                     return res.status(500).send('Internal Server Error');

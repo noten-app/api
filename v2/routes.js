@@ -18,8 +18,8 @@ if (config.beta.versions.includes("v2")) router.use((req, res, next) => {
 // AUTH
 router.use('/auth', require('./auth.js'));
 
-// CLASSES
-router.use('/classes', require('./classes.js'));
+// SUBJECTS
+router.use('/subjects', require('./subjects.js'));
 
 // GRADES
 router.use('/grades', require('./grades.js'));

@@ -44,7 +44,7 @@ router.use((req, res, next) => {
 
 router.get('/', (req, res) => {
     // Get all homework
-    connection.query('SELECT * FROM ' + config.mysql.tables.classes + ' WHERE user_id = ?', [res.locals.user_id], (err, results) => {
+    connection.query('SELECT * FROM ' + config.mysql.tables.subjects + ' WHERE user_id = ?', [res.locals.user_id], (err, results) => {
         if (err) return res.status(500).send('Internal Server Error');
         res.json(results);
     });
@@ -79,7 +79,7 @@ router.post('/', (req, res) => {
     // Get date in Format YYYY-MM-DD HH:MM:SS
     lastuse = new Date();
     lastuse = lastuse.toISOString().slice(0, 19).replace('T', ' ');
-    connection.query('INSERT INTO ' + config.mysql.tables.classes + ' (name, color, user_id, last_used, grade_k, grade_m, grade_t, grade_s) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', [req.body.name, req.body.color, res.locals.user_id, lastuse, req.body.grade_k, req.body.grade_m, req.body.grade_t, req.body.grade_s], (err, results) => {
+    connection.query('INSERT INTO ' + config.mysql.tables.subjects + ' (name, color, user_id, last_used, grade_k, grade_m, grade_t, grade_s) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', [req.body.name, req.body.color, res.locals.user_id, lastuse, req.body.grade_k, req.body.grade_m, req.body.grade_t, req.body.grade_s], (err, results) => {
         if (err) return res.status(500).send('Internal Server Error');
         res.json({ success: true, id: results.insertId });
     });
@@ -89,11 +89,11 @@ router.delete('/:id', (req, res) => {
     // Check if id is a number
     if (isNaN(req.params.id)) return res.status(400).json({ error: 'invalid_request', error_description: 'Invalid id' });
     // Check if homework exists and user is owner
-    connection.query('SELECT * FROM ' + config.mysql.tables.classes + ' WHERE id = ? AND user_id = ?', [req.params.id, res.locals.user_id], (err, results) => {
+    connection.query('SELECT * FROM ' + config.mysql.tables.subjects + ' WHERE id = ? AND user_id = ?', [req.params.id, res.locals.user_id], (err, results) => {
         if (err) return res.status(500).send('Internal Server Error');
         if (results.length == 0) return res.status(400).json({ error: 'invalid_request', error_description: 'Class does not exist or you are not the owner' });
         // Delete homework
-        connection.query('DELETE FROM ' + config.mysql.tables.classes + ' WHERE id = ?', [req.params.id], (err, results) => {
+        connection.query('DELETE FROM ' + config.mysql.tables.subjects + ' WHERE id = ?', [req.params.id], (err, results) => {
             if (err) return res.status(500).send('Internal Server Error');
             res.json({ success: true });
         });
@@ -107,7 +107,7 @@ router.patch('/:id', (req, res) => {
     if (!req.body) return res.status(400).json({ error: 'invalid_request', error_description: 'Missing request body' });
 
     // Load old class data
-    connection.query('SELECT * FROM ' + config.mysql.tables.classes + ' WHERE id = ?', [req.params.id], (err, results) => {
+    connection.query('SELECT * FROM ' + config.mysql.tables.subjects + ' WHERE id = ?', [req.params.id], (err, results) => {
         class_entry = results[0];
         error = false;
 
@@ -205,7 +205,7 @@ router.patch('/:id', (req, res) => {
         if (!error) {
 
             // Update homework
-            connection.query('UPDATE ' + config.mysql.tables.classes + ' SET name = ?, color = ?, grade_k = ?, grade_m = ?, grade_t = ?, grade_s = ?, average = ? WHERE id = ?', [class_entry.name, class_entry.color, class_entry.grade_k, class_entry.grade_m, class_entry.grade_t, class_entry.grade_s, class_entry.average, req.params.id], (err, results) => {
+            connection.query('UPDATE ' + config.mysql.tables.subjects + ' SET name = ?, color = ?, grade_k = ?, grade_m = ?, grade_t = ?, grade_s = ?, average = ? WHERE id = ?', [class_entry.name, class_entry.color, class_entry.grade_k, class_entry.grade_m, class_entry.grade_t, class_entry.grade_s, class_entry.average, req.params.id], (err, results) => {
                 if (err) return res.status(500).send('Internal Server Error');
                 res.json({ success: true });
             });
